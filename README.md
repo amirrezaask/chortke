@@ -12,8 +12,6 @@ let inc { x -> x + 1 }
 
 inc 1 ;; 2
 
-map [1 2 3] {x -> x*2 } ;; [ 2 4 6 ]
+map [1 2 3] { x -> x * 2 } ;; [ 2 4 6 ]
 
 reduce [1 2 3] { acc x -> acc + x } ;; 6
-
-```
