@@ -1,25 +1,26 @@
 package main
+
 import (
 	"fmt"
 	"unicode"
-
 )
+
 const (
-	tokenType_Symbol = "symbol"
-	tokenType_String = "string"
-	tokenType_Number = "number"
-	tokenType_Colon = "colon"
-	tokenType_Asterix = "asterix"
-	tokenType_Plus = "plus"
-	tokenType_Minus = "minus"
-	tokenType_Div = "div"
-	tokenType_Mod = "modulus"
-	tokenType_OpenSqBracket = "open_square_bracket"
+	tokenType_Symbol         = "symbol"
+	tokenType_String         = "string"
+	tokenType_Number         = "number"
+	tokenType_Colon          = "colon"
+	tokenType_Asterix        = "asterix"
+	tokenType_Plus           = "plus"
+	tokenType_Minus          = "minus"
+	tokenType_Div            = "div"
+	tokenType_Mod            = "modulus"
+	tokenType_OpenSqBracket  = "open_square_bracket"
 	tokenType_CloseSqBracket = "close_squate_bracket"
 )
 
 type token struct {
-	typ string
+	typ   string
 	value string
 }
 
@@ -41,7 +42,7 @@ func lex(code string) []token {
 	var tokens []token
 	var buffType string
 	var buff string
-	for _, char := range code  {
+	for _, char := range code {
 		if char == '[' {
 			flush(&tokens, buffType, buff)
 			buff = ""
@@ -96,10 +97,10 @@ func lex(code string) []token {
 		}
 	}
 	if buff != "" {
-				tokens = append(tokens, token{typ: buffType, value: buff})
-			}
-			buff = ""
-			buffType = ""
+		tokens = append(tokens, token{typ: buffType, value: buff})
+	}
+	buff = ""
+	buffType = ""
 	return tokens
 }
 func main() {
