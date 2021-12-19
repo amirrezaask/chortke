@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
 func getPrecedence(tok token) int {
@@ -25,8 +26,10 @@ func getPrecedence(tok token) int {
 	}
 	return 0
 }
-
-func shuntingYard(tokens []token) expr {
+func isFunction(tok token) bool {
+	return false
+}
+func shuntingYard(tokens []token) queue[token] {
 	var output queue[token]
 	var operators stack[token]
 	for _, tok := range tokens {
@@ -34,8 +37,8 @@ func shuntingYard(tokens []token) expr {
 			output.push(tok)
 		}
 		if isMathOp(tok) {
-			for operators.top().value == "(" && getPrecedence(operators.top()) >= getPrecedence(tok) {
-				output.push(operators.pop())
+			for operators.top() != nil && operators.top().value != "(" && getPrecedence(*operators.top()) >= getPrecedence(tok) {
+				output.push(*operators.pop())
 			}
 			operators.push(tok)
 		}
@@ -47,9 +50,12 @@ func shuntingYard(tokens []token) expr {
 				if len(operators.data) == 0 {
 					panic("unmatched paren")
 				}
-				output.push(operators.pop())
+				output.push(*operators.pop())
 			}
 			operators.pop()
+			if isFunction(*operators.top()) {
+				output.push(*operators.pop())
+			}
 		}
 
 	}
@@ -57,16 +63,56 @@ func shuntingYard(tokens []token) expr {
 		if operators.top().value == "(" {
 			panic("unmatched paren")
 		}
-		output.push(operators.pop())
+		output.push(*operators.pop())
 	}
 	fmt.Println(output)
-	return nil
+	return output
+}
+
+func evalMath(op string, arg1 , arg2 float64) float64 {
+
+	if op == "+" {
+		return arg1 + arg2
+	}
+	if op == "-" {
+		return arg1 - arg2
+	}
+	if op == "*" {
+		return arg1 * arg2
+	}
+	if op == "/" {
+		return arg1 / arg2
+	}
+	return 0
+}
+
+func evalPostfixQueue[T any](q queue[token]) interface{} {
+	var values stack[interface{}]
+	for _, elem := range q.data {
+		if elem.typ == "number" {
+			values.push(elem.value)
+			continue
+		}
+		if isMathOp(elem) {
+			fmt.Println(values.data)
+			// we should evaluate now :)
+			arg2, _ := strconv.ParseFloat((*values.pop()).(string), 10)
+			arg1, _ := strconv.ParseFloat((*values.pop()).(string), 10)
+			fmt.Println(elem.value, arg1, arg2)
+
+			values.push(fmt.Sprint(evalMath(elem.value, float64(arg1), float64(arg2))))
+		}
+	}
+	fmt.Println(values.data)
+	return values.data[len(values.data)-1]
 }
 
 func main() {
-	code := `2+3*2`
+	code := `2+3*2-1/2`
 	tokens := lex(code)
-	fmt.Printf("%+v\n", tokens)
-	shuntingYard(tokens)
+	e := evalPostfixQueue[token](shuntingYard(tokens)).(*interface{})
+	a := *e
+
+	fmt.Printf("%+v", a.(string))
 
 }
