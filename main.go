@@ -2,56 +2,71 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
-func parse(tokens []token) expr {
-    exprStack := &stack[expr]{}
-	var currentExpr expr
-
-	for _, tok := range tokens {
-		if currentExpr == nil {
-			if tok.typ == tokenType_Number {
-                fmt.Println("no currentExpr and token is number")
-				x, err := strconv.Atoi(tok.value)
-				if err != nil {
-					panic(err)
-				}
-				exprStack.push(&number{
-					n: float64(x),
-				})
-			}
-			if isMathOp(tok) {
-                fmt.Println("no currentExpr and token is mathOP")
-				var args []expr
-				args = append(args, exprStack.pop())
-				currentExpr = &arithmeticExpr {
-					op: tok.value,
-					args: args,
-				}
-			}
-		} else {
-			if tok.typ == tokenType_Number {
-				x, err := strconv.Atoi(tok.value)
-				if err != nil {
-					panic(err)
-				}
-				e := currentExpr.(*arithmeticExpr)
-				e.args = append(e.args, &number{n: float64(x)})
-                exprStack.push(e)
-                currentExpr = nil
-			}
-		}
+func getPrecedence(tok token) int {
+	if tok.value == "+" {
+		return 0
 	}
-	return exprStack.pop()
+	if tok.value == "-" {
+		return 0
+	}
+	if tok.value == "/" {
+		return 1
+	}
+	if tok.value == "*" {
+		return 1
+	}
+	if tok.value == "!" {
+		return 2
+	}
+	if tok.value == "^" {
+		return 2
+	}
+	return 0
+}
+
+func shuntingYard(tokens []token) expr {
+	var output queue[token]
+	var operators stack[token]
+	for _, tok := range tokens {
+		if tok.typ == "number" {
+			output.push(tok)
+		}
+		if isMathOp(tok) {
+			for operators.top().value == "(" && getPrecedence(operators.top()) >= getPrecedence(tok) {
+				output.push(operators.pop())
+			}
+			operators.push(tok)
+		}
+		if tok.value == "(" {
+			operators.push(tok)
+		}
+		if tok.value == ")" {
+			for operators.top().value != "(" {
+				if len(operators.data) == 0 {
+					panic("unmatched paren")
+				}
+				output.push(operators.pop())
+			}
+			operators.pop()
+		}
+
+	}
+	for len(operators.data) != 0 {
+		if operators.top().value == "(" {
+			panic("unmatched paren")
+		}
+		output.push(operators.pop())
+	}
+	fmt.Println(output)
+	return nil
 }
 
 func main() {
-	code := `123+2+3+8+9+1`
+	code := `2+3*2`
 	tokens := lex(code)
 	fmt.Printf("%+v\n", tokens)
-    parsed := parse(tokens).(*arithmeticExpr)
-    
-    result := parsed.Eval(nil)
-    fmt.Println(result)
+	shuntingYard(tokens)
+
 }

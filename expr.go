@@ -30,6 +30,13 @@ func (e *arithmeticExpr) Eval(m map[string]interface{}) interface{} {
 	rhs := e.args[1].Eval(m)
 	if e.op == "+" {
 		return lhs.(float64) + rhs.(float64)
-	}
+	} else if e.op == "-" {
+		return lhs.(float64) - rhs.(float64)
+    } else if e.op == "/" {
+		return lhs.(float64) / rhs.(float64)
+    } else if e.op == "*" {
+		return lhs.(float64) * rhs.(float64)
+    }
+
 	return nil
 }
