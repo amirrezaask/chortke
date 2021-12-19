@@ -17,6 +17,8 @@ const (
 	tokenType_Mod            = "modulus"
 	tokenType_OpenSqBracket  = "open_square_bracket"
 	tokenType_CloseSqBracket = "close_squate_bracket"
+	tokenType_OpenParen      = "open_paren"
+	tokenType_CloseParen     = "close_paren"
 )
 
 type token struct {
@@ -69,6 +71,12 @@ func lex(code string) []token {
 		} else if char == '%' {
 			flush(&tokens, &buffType, &buff)
 			tokens = append(tokens, token{typ: tokenType_Mod, value: "%"})
+		} else if char == '(' {
+			flush(&tokens, &buffType, &buff)
+			tokens = append(tokens, token{typ: tokenType_OpenParen, value: "("})
+		} else if char == ')' {
+			flush(&tokens, &buffType, &buff)
+			tokens = append(tokens, token{typ: tokenType_CloseParen, value: ")"})
 		} else if unicode.IsDigit(char) {
 			buffType = tokenType_Number
 			buff = buff + string(char)
@@ -83,4 +91,12 @@ func lex(code string) []token {
 	}
 	flush(&tokens, &buffType, &buff)
 	return tokens
+}
+
+func isMathOp(t token) bool {
+	return (t.typ == tokenType_Plus ||
+		t.typ == tokenType_Minus ||
+		t.typ == tokenType_Div ||
+		t.typ == tokenType_Asterix ||
+		t.typ == tokenType_Mod)
 }
