@@ -69,7 +69,7 @@ func shuntingYard(tokens []token) queue[token] {
 	return output
 }
 
-func evalMath(op string, arg1 , arg2 float64) float64 {
+func evalMath(op string, arg1, arg2 float64) float64 {
 
 	if op == "+" {
 		return arg1 + arg2
@@ -110,9 +110,7 @@ func evalPostfixQueue[T any](q queue[token]) interface{} {
 func main() {
 	code := `2+3*2-1/2`
 	tokens := lex(code)
-	e := evalPostfixQueue[token](shuntingYard(tokens)).(*interface{})
-	a := *e
-
-	fmt.Printf("%+v", a.(string))
+	e := evalPostfixQueue[token](shuntingYard(tokens)).(string)
+	fmt.Println(e)
 
 }

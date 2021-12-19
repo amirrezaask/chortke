@@ -1,24 +1,22 @@
 package main
 
-
-
 type stack[T any] struct {
-	data []*T
+	data []T
 }
 
 func (s *stack[T]) push(elem T) {
-	s.data = append(s.data, &elem)
+	s.data = append(s.data, elem)
 }
 func (s *stack[T]) top() *T {
 	if len(s.data) == 0 { return nil }
-	return s.data[len(s.data)-1]
+	return &s.data[len(s.data)-1]
 }
 
 func (s *stack[T]) pop() *T {
 	if len(s.data) == 0 { return new(T) }
 	top := s.data[len(s.data)-1]
 	s.data = s.data[:len(s.data)-1]
-	return top
+	return &top
 }
 
 type queue[T any] struct {
