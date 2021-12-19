@@ -65,7 +65,7 @@ func shuntingYard(tokens []token) queue[token] {
 		}
 		output.push(*operators.pop())
 	}
-	fmt.Println(output)
+	//fmt.Println(output)
 	return output
 }
 
@@ -94,16 +94,16 @@ func evalPostfixQueue[T any](q queue[token]) interface{} {
 			continue
 		}
 		if isMathOp(elem) {
-			fmt.Println(values.data)
+			// fmt.Println(values.data)
 			// we should evaluate now :)
 			arg2, _ := strconv.ParseFloat((*values.pop()).(string), 10)
 			arg1, _ := strconv.ParseFloat((*values.pop()).(string), 10)
-			fmt.Println(elem.value, arg1, arg2)
+			//fmt.Println(elem.value, arg1, arg2)
 
 			values.push(fmt.Sprint(evalMath(elem.value, float64(arg1), float64(arg2))))
 		}
 	}
-	fmt.Println(values.data)
+	//fmt.Println(values.data)
 	return values.data[len(values.data)-1]
 }
 
@@ -114,7 +114,11 @@ func eval(input string) string {
 }
 
 func main() {
-	code := `2+3*2-1/2`
-	fmt.Println(eval(code))
+	for {
+		var e string
+		fmt.Printf("> ")
+		fmt.Scanf("%s", &e)
+		fmt.Println(eval(e))
+	}
 
 }
