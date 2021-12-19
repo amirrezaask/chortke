@@ -46,14 +46,14 @@ func shuntingYard(tokens []token) queue[token] {
 			operators.push(tok)
 		}
 		if tok.value == ")" {
-			for operators.top().value != "(" {
+			for operators.top() != nil && operators.top().value != "(" {
 				if len(operators.data) == 0 {
 					panic("unmatched paren")
 				}
 				output.push(*operators.pop())
 			}
 			operators.pop()
-			if isFunction(*operators.top()) {
+			if operators.top() != nil && isFunction(*operators.top()) {
 				output.push(*operators.pop())
 			}
 		}
@@ -107,10 +107,14 @@ func evalPostfixQueue[T any](q queue[token]) interface{} {
 	return values.data[len(values.data)-1]
 }
 
+func eval(input string) string {
+	tokens := lex(input)
+	e := evalPostfixQueue[token](shuntingYard(tokens)).(string)
+	return e
+}
+
 func main() {
 	code := `2+3*2-1/2`
-	tokens := lex(code)
-	e := evalPostfixQueue[token](shuntingYard(tokens)).(string)
-	fmt.Println(e)
+	fmt.Println(eval(code))
 
 }
